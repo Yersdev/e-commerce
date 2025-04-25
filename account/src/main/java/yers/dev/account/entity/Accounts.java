@@ -15,9 +15,9 @@ public class Accounts extends BaseEntity{
     @Column(name = "user_id")
     private long userId;
 
-
-    @Column(name="keycloak_id", unique = true, nullable = false)
-    private UUID keycloakId;
+//
+//    @Column(name="keycloak_id", unique = true, nullable = false)
+//    private UUID keycloakId;
 
     @Column(name = "email", unique = true)
     private String email;

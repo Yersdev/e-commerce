@@ -15,10 +15,11 @@ import yers.dev.account.dto.ResponseDto;
 import yers.dev.account.dto.AccountsDto;
 import yers.dev.account.service.AccountsService;
 
+@Controller
 @AllArgsConstructor
+
 @RequestMapping(path="/api/accounts", produces = {MediaType.APPLICATION_JSON_VALUE})
 @Validated
-@RestController
 public class AccountsController {
     private final AccountsService accountsService;
 
