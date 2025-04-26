@@ -24,6 +24,9 @@ spring:
     openfeign:
       circuitbreaker:
         enabled: true
+  flyway:
+    enabled: true
+    locations: classpath:db
 
 management:
   endpoints:

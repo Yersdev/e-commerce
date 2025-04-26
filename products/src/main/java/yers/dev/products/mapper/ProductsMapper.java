@@ -3,10 +3,9 @@ package yers.dev.products.mapper;
 import org.mapstruct.Mapper;
 import yers.dev.products.dto.ProductsDto;
 import yers.dev.products.model.Products;
-
 import java.util.List;
 
-@Mapper
+@Mapper(componentModel = "spring")
     public interface ProductsMapper {
 
         ProductsDto toProductsDto(Products products);

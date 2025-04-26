@@ -16,10 +16,13 @@ public class Products extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long product_id;
 
+    @Column(unique = true, nullable = false, length = 50)
     private String name;
 
+    @Column(unique = true, nullable = false, length = 255)
     private String description;
 
+    @Column(nullable = false)
     private double price;
 
     private long stock_quantity;

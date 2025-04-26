@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import yers.dev.products.dto.ProductsDto;
-import yers.dev.products.mapper.ProductsMapper;
+import yers.dev.products.mapper.ProductsMapperImpl;
 import yers.dev.products.model.Category;
 import yers.dev.products.repository.ProductsRepository;
 
@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ProductsService {
     private final ProductsRepository productsRepository;
-    private final ProductsMapper productsMapper;
+    private final ProductsMapperImpl productsMapper;
 
     public List<ProductsDto> getProducts() {
         return productsMapper.toProductsDto(productsRepository.findAll());

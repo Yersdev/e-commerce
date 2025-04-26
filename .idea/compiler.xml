@@ -10,7 +10,6 @@
         <module name="eurekaserver" />
         <module name="configserver" />
         <module name="gateaway" />
-        <module name="products" />
       </profile>
       <profile name="Annotation profile for accounts" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -20,6 +19,19 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
         <module name="accounts" />
+      </profile>
+      <profile name="Annotation profile for products" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.0.Beta1/mapstruct-processor-1.6.0.Beta1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.6.0.Beta1/mapstruct-1.6.0.Beta1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.0.Beta1/mapstruct-processor-1.6.0.Beta1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.6.0.Beta1/mapstruct-1.6.0.Beta1.jar" />
+        </processorPath>
+        <module name="products" />
       </profile>
     </annotationProcessing>
   </component>

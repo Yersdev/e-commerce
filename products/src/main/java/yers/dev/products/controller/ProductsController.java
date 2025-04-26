@@ -1,26 +1,70 @@
 package yers.dev.products.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import yers.dev.products.dto.ProductsDto;
+import yers.dev.products.dto.ResponseDto;
+import yers.dev.products.model.Category;
 import yers.dev.products.service.ProductsService;
 
 import java.util.List;
 
-@Controller
+import static yers.dev.products.constants.ProductsConstants.*;
+
 @RequestMapping("/api/products")
-@AllArgsConstructor
 @RestController
+@AllArgsConstructor
 public class ProductsController {
     private final ProductsService productsService;
 
     @GetMapping
-    public List<ProductsDto> getProducts() {
-        return productsService.getProducts();
+    public ResponseEntity<List<ProductsDto>> getProducts() {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(productsService.getProducts());
     }
 
-
+    @PostMapping("/create")
+    public ResponseEntity<ResponseDto> createProduct(@Valid @RequestBody ProductsDto productsDto) {
+        productsService.addProduct(productsDto);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new ResponseDto(MESSAGE_200, MESSAGE_201));
+    }
+    @PutMapping("/update")
+    public ResponseEntity<ResponseDto> updateProduct(@Valid @RequestBody ProductsDto productsDto) {
+        productsService.updateProduct(productsDto);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDto(MESSAGE_200, MESSAGE_201_UPDATED_200));
+    }
+    @GetMapping("/fetch")
+    public ResponseEntity<ResponseDto> fetchProductDetails(@Valid @RequestBody ProductsDto productsDto) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDto(MESSAGE_200, MESSAGE_200));
+    }
+    @GetMapping("/category/{category}")
+    public ResponseEntity<List<ProductsDto>> getProductsByCategory(@PathVariable("category") Category category) {
+        productsService.getByCategory(category);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(productsService.getByCategory(category));
+    }
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ResponseDto> deleteProduct(@PathVariable("id") Long id) {
+        productsService.deleteProduct(id);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDto(MESSAGE_200, STATUS_DELETED_200));
+    }
+    @GetMapping("/fetch/{id}")
+    public ResponseEntity<ProductsDto> fetchProductDetails(@PathVariable("id") Long id) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(productsService.getProduct(id));
+    }
 }

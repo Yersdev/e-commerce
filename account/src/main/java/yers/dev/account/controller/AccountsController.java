@@ -2,6 +2,7 @@ package yers.dev.account.controller;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,14 +16,14 @@ import yers.dev.account.dto.ResponseDto;
 import yers.dev.account.dto.AccountsDto;
 import yers.dev.account.service.AccountsService;
 
+import java.util.List;
+
 @AllArgsConstructor
 @RequestMapping(path="/api/accounts", produces = {MediaType.APPLICATION_JSON_VALUE})
 @Validated
 @RestController
 public class AccountsController {
     private final AccountsService accountsService;
-
-    private static final Logger logger = LoggerFactory.getLogger(AccountsController.class);
 
 
 
@@ -56,12 +57,24 @@ public class AccountsController {
                 .body(new ResponseDto(AccountsConstants.STATUS_DELETED_200, AccountsConstants.MESSAGE_DELETED_200));
     }
 
-    @GetMapping("/fetch")
-    public ResponseEntity<ResponseDto> fetchAccountDetails(@Valid @RequestBody AccountsDto accountsDto) {
-
+    @GetMapping("/fetch/{id}")
+    public ResponseEntity<AccountsDto> fetchAccountDetailsById(@PathVariable("id") Long id) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ResponseDto(AccountsConstants.STATUS_200, AccountsConstants.MESSAGE_200));
+                .body(accountsService.getUserById(id));
     }
 
+    @GetMapping("/fetch/email/{email}")
+    public ResponseEntity<AccountsDto> fetchAccountDetailsByEmail(@PathVariable("email") String email) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(accountsService.getUserByEmail(email));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<AccountsDto>> getAllAccounts() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(accountsService.getAllUsers());
+    }
 }

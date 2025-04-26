@@ -30,21 +30,26 @@ public class GateawayApplication {
         return routeLocatorBuilder.routes()
                 .route(p -> p
                         .path("/api/accounts/**")
-                        .filters(f -> f.rewritePath("/e-commerce/api/(?<segment>.*)", "/api/${segment}")
-                        .addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
-                                .circuitBreaker(config -> config.setName("accountsCircuitBreaker")
-                                        .setFallbackUri("forward:/contactSupport")))
-                        .uri("lb://ACCOUNTS")).build();
+                        .filters(f -> f.rewritePath("/api/(?<segment>.*)", "/e-commerce/api/accounts${segment}")
+                                .circuitBreaker(config -> config.setName("accountsCircuitBreaker"))
+                        ).uri("lb://ACCOUNTS"))
+                .route(p -> p
+                        .path("/api/products/**")
+                        .filters(f -> f.rewritePath("/api/(?<segment>.*)", "/e-commerce/api/products/${segment}")
+                                .circuitBreaker(config -> config.setName("productsCircuitBreaker")))
+                        .uri("lb://PRODUCTS"))
+                .build();
+    }
+
+
+    @Bean
+    public Customizer<ReactiveResilience4JCircuitBreakerFactory> defaultCustomizer() {
+        return factory -> factory.configureDefault(id -> new Resilience4JConfigBuilder(id)
+                .circuitBreakerConfig(CircuitBreakerConfig.ofDefaults())
+                .timeLimiterConfig(TimeLimiterConfig.custom().timeoutDuration(Duration.ofSeconds(10))
+                        .build()).build());
     }
 //
-//    @Bean
-//    public Customizer<ReactiveResilience4JCircuitBreakerFactory> defaultCustomizer() {
-//        return factory -> factory.configureDefault(id -> new Resilience4JConfigBuilder(id)
-//                .circuitBreakerConfig(CircuitBreakerConfig.ofDefaults())
-//                .timeLimiterConfig(TimeLimiterConfig.custom().timeoutDuration(Duration.ofSeconds(10))
-//                        .build()).build());
-//    }
-////
 //    @Bean
 //    public RedisRateLimiter redisRateLimiter() {
 //        return new RedisRateLimiter(1, 1, 1);
