@@ -12,6 +12,8 @@ public final class AccountsConstants {
     public static final String  MESSAGE_201 = "Account created successfully";
     public static final String  STATUS_200 = "200";
     public static final String  MESSAGE_200 = "Request processed successfully";
+    public static final String  STATUS_200_LOGOUT= "200";
+    public static final String  MESSAGE_200_LOGOUT= "Logout successful";
     public static final String  STATUS_DELETED_200 = "200";
     public static final String  MESSAGE_DELETED_200 = "Request processed successfully";
     public static final String  STATUS_417 = "417";

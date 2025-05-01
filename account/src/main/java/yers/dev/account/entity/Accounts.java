@@ -1,8 +1,6 @@
 package yers.dev.account.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import java.util.UUID;
@@ -12,12 +10,17 @@ import java.util.UUID;
 @Setter
 public class Accounts extends BaseEntity{
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private long userId;
 
 //
 //    @Column(name="keycloak_id", unique = true, nullable = false)
 //    private UUID keycloakId;
+    /** Уникальный идентификатор пользователя в Keycloak */
+    @Column(unique = true, nullable = false)
+    private String keycloakId;
+
 
     @Column(name = "email", unique = true)
     private String email;

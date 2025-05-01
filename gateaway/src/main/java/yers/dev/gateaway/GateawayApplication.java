@@ -29,15 +29,26 @@ public class GateawayApplication {
     public RouteLocator eazyBankRouteConfig(RouteLocatorBuilder routeLocatorBuilder) {
         return routeLocatorBuilder.routes()
                 .route(p -> p
-                        .path("/api/accounts/**")
-                        .filters(f -> f.rewritePath("/api/(?<segment>.*)", "/e-commerce/api/accounts${segment}")
+                        .path("/e-commerce/api/accounts/**", "/e-commerce/api/accounts")
+                        .filters(f -> f.rewritePath("/e-commerce/api/accounts(?<segment>/?.*)", "/api/accounts${segment}")
                                 .circuitBreaker(config -> config.setName("accountsCircuitBreaker"))
-                        ).uri("lb://ACCOUNTS"))
+                        )
+                        .uri("lb://ACCOUNTS")
+                )
+                // просто проксируем как есть
                 .route(p -> p
-                        .path("/api/products/**")
-                        .filters(f -> f.rewritePath("/api/(?<segment>.*)", "/e-commerce/api/products/${segment}")
-                                .circuitBreaker(config -> config.setName("productsCircuitBreaker")))
+                        .path("/e-commerce/api/products/**")
+                        .filters(f -> f
+                                // путь остается неизменным, никакого rewritePath
+                                .circuitBreaker(config -> config.setName("productsCircuitBreaker"))
+                        )
                         .uri("lb://PRODUCTS"))
+                .route(p -> p
+                        .path("/e-commerce/auth/**")
+                        .filters(f -> f.rewritePath("/e-commerce/auth/(?<segment>.*)", "/auth/${segment}")
+                                .circuitBreaker(config -> config.setName("authCircuitBreaker")))
+                        .uri("lb://ACCOUNTS"))
+
                 .build();
     }
 

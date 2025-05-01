@@ -14,7 +14,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SpringBootApplication
 
 @EnableFeignClients
-@EnableJpaAuditing(auditorAwareRef = "auditAwareImpl")
 @OpenAPIDefinition(
         info = @Info(
                 title = "Accounts microservice REST API Documentation",
@@ -35,6 +34,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
                 url = "https://www.eazybytes.com/swagger-ui.html"
         )
 )
+@EnableJpaAuditing
+
 public class AccountApplication {
 
     public static void main(String[] args) {

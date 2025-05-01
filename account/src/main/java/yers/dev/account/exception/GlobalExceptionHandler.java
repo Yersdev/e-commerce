@@ -41,29 +41,48 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(validationErrors, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponseDto> handleGlobalException(Exception e) {
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<ErrorResponseDto> handleGlobalException(Exception e) {
+//
+//        ErrorResponseDto errorResponseDTO = new ErrorResponseDto(
+//                webRequest.getDescription(false),
+//                HttpStatus.INTERNAL_SERVER_ERROR,
+//                e.getMessage(),
+//                LocalDateTime.now()
+//        );
+//        return new ResponseEntity<>(errorResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+//
+//    }
 
-        ErrorResponseDto errorResponseDTO = new ErrorResponseDto(
+//    @ExceptionHandler(ResourceNotFoundException.class)
+//    public ResponseEntity<ErrorResponseDto> handleResourceNotFoundException(ResourceNotFoundException e) {
+//
+//        ErrorResponseDto errorResponseDTO = new ErrorResponseDto(
+//                webRequest.getDescription(false),
+//                HttpStatus.NOT_FOUND,
+//                e.getMessage(),
+//                LocalDateTime.now()
+//        );
+//        return new ResponseEntity<>(errorResponseDTO, HttpStatus.NOT_FOUND);
+//    }
+
+    /**
+     * Обрабатывает исключения, когда аккаунт с такими данными уже существует.
+     *
+     * @param exception   исключение {@link SameAccountExistException}
+     * @param webRequest  текущий веб-запрос
+     * @return {@link ResponseEntity} с {@link yers.dev.account.auth.entity.dto.ErrorResponseDto} и статусом 409 CONFLICT
+     */
+    @ExceptionHandler(SameAccountExistException.class)
+    public ResponseEntity<yers.dev.account.auth.entity.dto.ErrorResponseDto> handleSameAccountExistException(SameAccountExistException exception,
+                                                                                                             WebRequest webRequest) {
+        yers.dev.account.auth.entity.dto.ErrorResponseDto errorResponseDTO = new yers.dev.account.auth.entity.dto.ErrorResponseDto(
                 webRequest.getDescription(false),
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                e.getMessage(),
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
                 LocalDateTime.now()
         );
-        return new ResponseEntity<>(errorResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
-
-    }
-
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponseDto> handleResourceNotFoundException(ResourceNotFoundException e) {
-
-        ErrorResponseDto errorResponseDTO = new ErrorResponseDto(
-                webRequest.getDescription(false),
-                HttpStatus.NOT_FOUND,
-                e.getMessage(),
-                LocalDateTime.now()
-        );
-        return new ResponseEntity<>(errorResponseDTO, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(errorResponseDTO, HttpStatus.CONFLICT);
     }
 
 }

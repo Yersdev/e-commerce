@@ -27,6 +27,32 @@ spring:
     openfeign:
       circuitbreaker:
         enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/yers__check}
+      client:
+        provider:
+          keycloak:
+            issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/yers__check}
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            client-id: ${KEYCLOAK_CLIENT_ID:springsecurity}
+            client-secret: ${KEYCLOAK_CLIENT_SECRET}
+            scope: openid
+
+keycloak:
+  auth-server-url: ${KEYCLOAK_AUTH_URL:http://localhost:8080}
+  realm: ${KEYCLOAK_REALM:yers__check}
+  client-id: ${KEYCLOAK_CLIENT_ID:springsecurity}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET}
+  admin:
+    client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:springsecurity}
+    client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
+    username: ${KEYCLOAK_ADMIN_USERNAME}
+    password: ${KEYCLOAK_ADMIN_PASSWORD}
 
 management:
   endpoints:
