@@ -1,15 +1,14 @@
-package yers.dev.inventory.service.client;
+package yers.dev.products.service.client;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import yers.dev.inventory.dto.ProductsDto;
+import yers.dev.products.dto.InventoryDto;
 
 @Component
-public class ProductFallbacks implements ProductFeignClient{
-
-
+public class InventoryFallbacks implements InventoryFeignClient {
     @Override
-    public ResponseEntity<ProductsDto> fetchProductDetails(String correlationId, Long id) {
-        return null;
+    public ResponseEntity<InventoryDto> createInventory(String correlationId, InventoryDto inventoryDto) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
     }
 }

@@ -4,9 +4,9 @@ import lombok.Data;
 import yers.dev.inventory.entity.Category;
 
 @Data
-public class ProductsDto {
+public class ProductInventoryDto {
 
-    private long product_id;
+    private long product_inventory_id;
 
     private String name;
 
@@ -17,5 +17,9 @@ public class ProductsDto {
     private long stock_quantity;
 
     private Category category;
+
+    private Long quantity;
+
+    private String warehouseLocation; // TODO: implement
 
 }

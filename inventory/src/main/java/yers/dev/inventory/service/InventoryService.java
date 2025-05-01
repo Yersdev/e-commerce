@@ -1,56 +1,56 @@
 package yers.dev.inventory.service;
 
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientRequestException;
-import reactor.core.publisher.Mono;
 import yers.dev.inventory.dto.InventoryDto;
+import yers.dev.inventory.dto.ProductInventoryDto;
 import yers.dev.inventory.dto.ProductsDto;
-import yers.dev.inventory.exception.ExternalServiceException;
-import yers.dev.inventory.exception.ExternalServiceUnavailableException;
-import yers.dev.inventory.exception.GeneralExternalCallException;
+import yers.dev.inventory.entity.Inventory;
 import yers.dev.inventory.exception.ProductNotFoundException;
+import yers.dev.inventory.mapper.InventoryMapper;
+import yers.dev.inventory.repository.InventoryRepository;
 import yers.dev.inventory.service.client.ProductFeignClient;
+
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
 public class InventoryService {
 
     private final ProductFeignClient productFeignClient;
+    private final InventoryRepository inventoryRepository;
+    private final InventoryMapper inventoryMapper;
 
+    public ProductInventoryDto fetchProduct(Long productId) {
+        InventoryDto inventoryDto = inventoryMapper.toInventoryDto(inventoryRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException(productId.toString())));
+        ResponseEntity<ProductsDto> productsDtoResponseEntity = productFeignClient.fetchProductDetails("correlationId",productId);
+        ProductInventoryDto productInventoryDto = new ProductInventoryDto();
+        productInventoryDto.setProduct_inventory_id(inventoryDto.getInventory_id());
+        productInventoryDto.setName(productsDtoResponseEntity.getBody().getName());
+        productInventoryDto.setDescription(productsDtoResponseEntity.getBody().getDescription());
+        productInventoryDto.setPrice(productsDtoResponseEntity.getBody().getPrice());
+        productInventoryDto.setStock_quantity(inventoryDto.getQuantity());
+        productInventoryDto.setCategory(productsDtoResponseEntity.getBody().getCategory());
+        productInventoryDto.setQuantity(inventoryDto.getQuantity());
+        return productInventoryDto;
 
-
-    public ProductsDto fetchProduct(Long productId) {
-        HttpStatus statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-
-        try {
-            return webClient.get()
-                    .uri("/fetch/{id}", productId)   // подставляем {id} в адрес
-                    .retrieve()
-                    .onStatus(HttpStatusCode::is4xxClientError, response -> {
-                        return Mono.error(new ProductNotFoundException("Product with ID " + productId + " not found."));
-                    })
-                    .onStatus(HttpStatusCode::is5xxServerError, response -> {
-                        return Mono.error(new ExternalServiceException("Product Service returned 5xx error."));
-                    })
-                    .bodyToMono(ProductsDto.class)
-                    .block(); // тут мы блокируем и превращаем в обычный синхронный вызов (как RestTemplate)
-        } catch (WebClientRequestException e) {
-            // Проблемы с сетью (например, сервис недоступен)
-            throw new ExternalServiceUnavailableException("Product Service is unavailable: " + e.getMessage());
-        } catch (Exception e) {
-            // Ловим всё остальное
-            throw new GeneralExternalCallException("Unexpected error occurred: " + e.getMessage());
-        }
     }
 
-    public ProductsDto createProduct(ProductsDto productDto) {
+
+    public List<InventoryDto> fetchAllProducts() {
+        return Collections.singletonList(inventoryMapper.toInventoryDto((Inventory) inventoryRepository.findAll()));
+    }
+
+    @Transactional
+    public void addInventory(@Valid InventoryDto inventoryDto) {
+        inventoryRepository.save(inventoryMapper.toInventory(inventoryDto));
+    }
+
+    public void updateInventory(InventoryDto inventoryDto) {
+        inventoryRepository.save(inventoryMapper.toInventory(inventoryDto));
+    }
 }
-
-    public InventoryDto fetchAllProducts() {
-
-    }
-    }
