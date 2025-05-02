@@ -7,16 +7,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.circuitbreaker.resilience4j.ReactiveResilience4JCircuitBreakerFactory;
 import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder;
 import org.springframework.cloud.client.circuitbreaker.Customizer;
-import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
-import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpMethod;
-import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 
 @SpringBootApplication
 public class GateawayApplication {
@@ -26,7 +21,7 @@ public class GateawayApplication {
     }
 
     @Bean
-    public RouteLocator eazyBankRouteConfig(RouteLocatorBuilder routeLocatorBuilder) {
+    public RouteLocator RouteConfig(RouteLocatorBuilder routeLocatorBuilder) {
         return routeLocatorBuilder.routes()
                 .route(p -> p
                         .path("/e-commerce/api/accounts/**", "/e-commerce/api/accounts")
@@ -35,10 +30,9 @@ public class GateawayApplication {
                         )
                         .uri("lb://ACCOUNTS")
                 )
-                // просто проксируем как есть
                 .route(p -> p
-                        .path("/e-commerce/api/products/**")
-                        .filters(f -> f
+                        .path("/e-commerce/api/products/**", "/e-commerce/api/products")
+                        .filters(f -> f.rewritePath("/e-commerce/api/products(?<segment>/?.*)", "/api/products${segment}")
                                 // путь остается неизменным, никакого rewritePath
                                 .circuitBreaker(config -> config.setName("productsCircuitBreaker"))
                         )
@@ -48,7 +42,11 @@ public class GateawayApplication {
                         .filters(f -> f.rewritePath("/e-commerce/auth/(?<segment>.*)", "/auth/${segment}")
                                 .circuitBreaker(config -> config.setName("authCircuitBreaker")))
                         .uri("lb://ACCOUNTS"))
-
+                .route(p -> p
+                        .path("/e-commerce/api/inventory/**", "/e-commerce/api/inventory")
+                        .filters(f -> f.rewritePath("/e-commerce/api/inventory(?<segment>/?.*)", "/api/inventory${segment}")
+                                .circuitBreaker(config -> config.setName("ordersCircuitBreaker")))
+                        .uri("lb://INVENTORY"))
                 .build();
     }
 

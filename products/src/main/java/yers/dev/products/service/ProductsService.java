@@ -2,6 +2,7 @@ package yers.dev.products.service;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import yers.dev.products.dto.InventoryDto;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class ProductsService {
     private final ProductsRepository productsRepository;
     private final ProductsMapper productsMapper;
@@ -29,9 +31,12 @@ public class ProductsService {
     @Transactional
     public ProductsDto createProduct(ProductInventoryDto productInventoryDto) {
 
+        log.info("ProductInventoryDto: {}", productInventoryDto);
         InventoryDto inventoryDto = ProductInventoryMapper.toInventoryDto(productInventoryDto);
-        ProductsDto productsDto = ProductInventoryMapper.toProductsDto(productInventoryDto);
 
+        ProductsDto productsDto = productsMapper.toProductsDto(productInventoryDto);
+
+        log.info("InventoryDto: {}", inventoryDto);
         ResponseEntity<InventoryDto> response = inventoryFeignClient.createInventory(
                 "correlationId", inventoryDto
         );

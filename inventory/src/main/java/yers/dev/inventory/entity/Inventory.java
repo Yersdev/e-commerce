@@ -13,10 +13,10 @@ import lombok.Setter;
 public class Inventory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long inventory_id;
 
     private Long quantity;
 
-    private String warehouseLocation; // TODO: implement
+    private String warehouseLocation;
 
 }

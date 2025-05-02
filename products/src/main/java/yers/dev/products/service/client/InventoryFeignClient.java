@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import yers.dev.products.dto.InventoryDto;
-import yers.dev.products.service.client.InventoryFallbacks;
 
 @FeignClient(name = "inventory", fallback = InventoryFallbacks.class)
 public interface InventoryFeignClient {

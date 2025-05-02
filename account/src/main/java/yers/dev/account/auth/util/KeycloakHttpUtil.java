@@ -116,4 +116,30 @@ public class KeycloakHttpUtil {
                 .toBodilessEntity()
                 .block();
     }
+
+    /**
+     * Выполняет DELETE-запрос с Bearer-токеном авторизации.
+     * Если ответ не успешный (не 2xx), бросает исключение.
+     *
+     * @param baseUrl базовый URL
+     * @param uri     относительный URI
+     * @param token   Bearer-токен
+     */
+    public void deleteJson(String baseUrl, String uri, String token) {
+        webClientBuilder
+                .baseUrl(baseUrl)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .build()
+                .delete()
+                .uri(uri)
+                .retrieve()
+                .onStatus(status -> !status.is2xxSuccessful(), clientResp ->
+                        clientResp.bodyToMono(String.class)
+                                .flatMap(errorBody -> Mono.error(new RuntimeException(
+                                        "Delete failed: " + errorBody)))
+                )
+                .toBodilessEntity()
+                .block();
+    }
+
 }

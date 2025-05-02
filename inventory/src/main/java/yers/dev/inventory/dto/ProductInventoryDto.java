@@ -22,4 +22,6 @@ public class ProductInventoryDto {
 
     private String warehouseLocation; // TODO: implement
 
+    private boolean isActive;
+
 }

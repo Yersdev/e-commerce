@@ -11,4 +11,9 @@ public class InventoryFallbacks implements InventoryFeignClient {
     public ResponseEntity<InventoryDto> createInventory(String correlationId, InventoryDto inventoryDto) {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
     }
+
+    @Override
+    public ResponseEntity<InventoryDto> updateInventory(String correlationId, InventoryDto inventoryDto) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+    }
 }

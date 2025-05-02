@@ -1,6 +1,7 @@
 package yers.dev.account.service;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -11,17 +12,14 @@ import yers.dev.account.entity.Accounts;
 import yers.dev.account.exception.ResourceNotFoundException;
 import yers.dev.account.mapper.AccountsMapper;
 import yers.dev.account.repository.AccountsRepository;
-import java.time.LocalDateTime;
+
 import java.util.List;
 
 @Service
 @AllArgsConstructor
 public class AccountsService {
     private final AccountsRepository accountsRepository;
-
-    public void deleteUserById(AccountsDto accountsDto) {
-        accountsRepository.findByUserId(accountsRepository.findByEmail(accountsDto.getEmail()).orElseThrow(() -> new RuntimeException("User not found")).getUserId());
-    }
+    //private final KeycloakUserService keycloakUserService;
 
     public List<AccountsDto> getAllUsers() {
         return AccountsMapper.mapToUserDto(accountsRepository.findAll());
@@ -31,19 +29,6 @@ public class AccountsService {
         return AccountsMapper.mapToUserDto(accountsRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("Account", "email", email)), new AccountsDto());
     }
 
-    public AccountsDto getUserById(Long userId) {
-        Accounts user = accountsRepository.findByUserId(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        return AccountsMapper.mapToUserDto(user, new AccountsDto());
-    }
-
-    @Transactional
-    public boolean updateUser(AccountsDto accountsDto) {
-        Accounts user = accountsRepository.findByEmail(accountsDto.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
-        user.setActive(true);
-        AccountsMapper.mapToUser(user, accountsDto);
-        accountsRepository.save(user);
-        return true;
-    }
 
     /**
      * Получает информацию о текущем пользователе по его Keycloak ID.
@@ -75,18 +60,10 @@ public class AccountsService {
         u.setLastName(req.getLastName());
         u.setEmail(req.getEmail());
         u.setPhoneNumber(Long.parseLong(req.getPhoneNumber()));
+        u.setActive(true);
         accountsRepository.save(u);
     }
 
-    @Transactional
-    public boolean createNewAccount(AccountsDto accountsDto) {
-        Accounts user = new Accounts();
-        AccountsMapper.mapToUser(user, accountsDto);
-        user.setCreatedAt(LocalDateTime.now());
-        user.setActive(true);
-        accountsRepository.save(user);
-        return true;
-    }
 
     /**
      * Обновляет данные пользователя в базе по его Keycloak ID.
@@ -96,7 +73,8 @@ public class AccountsService {
      * @throws ResponseStatusException если пользователь не найден
      */
     @Transactional
-    public void updateAccount(RegistrationRequest req , String keycloakId) {
+    public void KeycloakUpdateAccount(RegistrationRequest req , String keycloakId) {
+
         Accounts user = accountsRepository.findByKeycloakId(keycloakId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
@@ -105,16 +83,29 @@ public class AccountsService {
         user.setLastName(req.getLastName());
         user.setEmail(req.getEmail());
         user.setPhoneNumber(Long.parseLong(req.getPhoneNumber()));
+        user.setActive(true);
         accountsRepository.save(user);
     }
 
+    @Transactional
     public void activateUser(Long id) {
         Accounts user = accountsRepository.findByUserId(id).orElseThrow(() -> new RuntimeException("User not found"));
         user.setActive(true);
         accountsRepository.save(user);
     }
 
+    @Transactional
+    public void deactivateUser(Long id) {
+        Accounts user = accountsRepository.findByUserId(id).orElseThrow(() -> new RuntimeException("User not found"));
+        user.setActive(false);
+        accountsRepository.save(user);
+    }
 
 
+    @Transactional
+    public void deleteUser(String email) {
+        Accounts user = accountsRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        accountsRepository.delete(user);
+    }
 
 }

@@ -1,6 +1,7 @@
 package yers.dev.products.mapper;
 
 import org.mapstruct.Mapper;
+import yers.dev.products.dto.ProductInventoryDto;
 import yers.dev.products.dto.ProductsDto;
 import yers.dev.products.model.Products;
 import java.util.List;
@@ -13,4 +14,7 @@ import java.util.List;
 
         List<ProductsDto> toProductsDto(List<Products> products);
         List<Products> toProducts(List<ProductsDto> productsDto);
-    }
+
+        ProductsDto toProductsDto(ProductInventoryDto productInventoryDto);
+        Products toProducts(ProductInventoryDto productInventoryDto);
+}

@@ -42,12 +42,7 @@ public class ProductsController {
                 .status(HttpStatus.OK)
                 .body(new ResponseDto(MESSAGE_200, MESSAGE_201_UPDATED_200));
     }
-    @GetMapping("/fetch")
-    public ResponseEntity<ResponseDto> fetchProductDetails(@Valid @RequestBody ProductsDto productsDto) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ResponseDto(MESSAGE_200, MESSAGE_200));
-    }
+
     @GetMapping("/category/{category}")
     public ResponseEntity<List<ProductsDto>> getProductsByCategory(@PathVariable("category") Category category) {
         productsService.getProductsByCategory(category);

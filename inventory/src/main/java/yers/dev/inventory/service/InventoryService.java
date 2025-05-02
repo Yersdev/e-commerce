@@ -42,7 +42,8 @@ public class InventoryService {
 
 
     public List<InventoryDto> fetchAllProducts() {
-        return Collections.singletonList(inventoryMapper.toInventoryDto((Inventory) inventoryRepository.findAll()));
+        System.out.println("fetching all products{} " + inventoryRepository.findAll());
+        return inventoryMapper.toInventoryDto(inventoryRepository.findAll());
     }
 
     @Transactional

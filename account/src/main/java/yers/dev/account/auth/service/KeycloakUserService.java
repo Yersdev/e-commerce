@@ -142,8 +142,7 @@ public class KeycloakUserService {
             throw e;  // или бросить своё исключение с более понятным сообщением
         }
 
-        Map<String,Object> resp = authService.login(AuthMapper.toAuthRequest(req));
-        return resp;
+        return authService.login(AuthMapper.toAuthRequest(req));
     }
 
     /**
@@ -175,6 +174,30 @@ public class KeycloakUserService {
                 payload
         );
 
-        accountsService.updateAccount(req, keycloakId);
+        accountsService.KeycloakUpdateAccount(req, keycloakId);
     }
+
+
+    @Transactional
+    public void deleteUser(String keycloakId) {
+        String token = getAdminAccessToken(); // Получаем токен администратора
+
+        try {
+            // Выполняем запрос на удаление пользователя
+            keycloakHttpUtil.deleteJson(
+                    keycloakUrl + "/admin/realms/" + realm,
+                    "/users/" + keycloakId,
+                    token
+            );
+            log.info("User with ID {} has been deleted from Keycloak.", keycloakId);
+        } catch (WebClientResponseException e) {
+            // Логирование ошибки при удалении
+            log.error("Keycloak returned {}: {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("Failed to delete user from Keycloak", e);
+        }
+
+        // Логика для удаления пользователя из вашей локальной базы данных (если необходимо)
+        accountsService.deleteUser(keycloakId); // Пример вызова для удаления пользователя из локальной базы
+    }
+
 }

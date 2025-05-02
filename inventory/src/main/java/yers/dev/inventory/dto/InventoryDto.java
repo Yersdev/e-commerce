@@ -9,6 +9,6 @@ public class InventoryDto {
 
     private Long quantity;
 
-    private String warehouseLocation; // TODO: implement
+    private String warehouseLocation;
 
 }
