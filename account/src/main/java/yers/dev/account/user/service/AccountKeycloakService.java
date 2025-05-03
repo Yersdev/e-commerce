@@ -1,4 +1,4 @@
-package yers.dev.account.service;
+package yers.dev.account.user.service;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import yers.dev.account.auth.entity.dto.RegistrationRequest;
 import yers.dev.account.auth.service.KeycloakUserService;
-import yers.dev.account.entity.Accounts;
-import yers.dev.account.repository.AccountsRepository;
+import yers.dev.account.user.entity.Accounts;
+import yers.dev.account.user.repository.AccountsRepository;
 
 @Service
 @AllArgsConstructor

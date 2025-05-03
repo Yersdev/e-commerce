@@ -1,4 +1,4 @@
-package yers.dev.account.entity;
+package yers.dev.account.user.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

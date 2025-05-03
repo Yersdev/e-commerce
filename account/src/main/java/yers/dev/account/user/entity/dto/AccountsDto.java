@@ -1,4 +1,4 @@
-package yers.dev.account.dto;
+package yers.dev.account.user.entity.dto;
 
 import lombok.Data;
 

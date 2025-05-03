@@ -11,7 +11,6 @@ public class ProductInventoryMapper {
         productsDto.setName(dto.getName());
         productsDto.setDescription(dto.getDescription());
         productsDto.setPrice(dto.getPrice());
-        productsDto.setStock_quantity(dto.getStock_quantity());
         productsDto.setCategory(dto.getCategory());
         return productsDto;
     }

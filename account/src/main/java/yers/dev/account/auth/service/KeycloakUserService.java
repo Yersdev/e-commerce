@@ -15,8 +15,8 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 import yers.dev.account.auth.entity.dto.RegistrationRequest;
 import yers.dev.account.auth.util.KeycloakHttpUtil;
-import yers.dev.account.mapper.AuthMapper;
-import yers.dev.account.service.AccountsService;
+import yers.dev.account.user.mapper.AuthMapper;
+import yers.dev.account.user.service.AccountsService;
 
 import java.util.List;
 import java.util.Map;

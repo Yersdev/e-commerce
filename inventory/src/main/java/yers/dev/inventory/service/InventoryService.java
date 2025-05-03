@@ -35,7 +35,6 @@ public class InventoryService {
         productInventoryDto.setPrice(productsDtoResponseEntity.getBody().getPrice());
         productInventoryDto.setStock_quantity(inventoryDto.getQuantity());
         productInventoryDto.setCategory(productsDtoResponseEntity.getBody().getCategory());
-        productInventoryDto.setQuantity(inventoryDto.getQuantity());
         return productInventoryDto;
 
     }
@@ -51,7 +50,12 @@ public class InventoryService {
         inventoryRepository.save(inventoryMapper.toInventory(inventoryDto));
     }
 
-    public void updateInventory(InventoryDto inventoryDto) {
-        inventoryRepository.save(inventoryMapper.toInventory(inventoryDto));
+    @Transactional
+    public void updateInventory(Long productId, InventoryDto inventoryDto) {
+        Inventory inventory = inventoryRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException(productId.toString()));
+
+        inventory.setQuantity(inventoryDto.getQuantity());
+        inventory.setWarehouseLocation(inventoryDto.getWarehouseLocation());
+        inventoryRepository.save(inventory);
     }
 }

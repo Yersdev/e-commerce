@@ -18,10 +18,7 @@ public class ProductInventoryDto {
 
     private Category category;
 
-    private Long quantity;
 
-    private String warehouseLocation; // TODO: implement
-
-    private boolean isActive;
+    private String warehouseLocation;
 
 }

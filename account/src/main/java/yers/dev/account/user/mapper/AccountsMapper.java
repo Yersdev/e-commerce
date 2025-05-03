@@ -1,7 +1,7 @@
-    package yers.dev.account.mapper;
+    package yers.dev.account.user.mapper;
 
-    import yers.dev.account.dto.AccountsDto;
-    import yers.dev.account.entity.Accounts;
+    import yers.dev.account.user.entity.dto.AccountsDto;
+    import yers.dev.account.user.entity.Accounts;
 
     import java.util.List;
     import java.util.stream.Collectors;

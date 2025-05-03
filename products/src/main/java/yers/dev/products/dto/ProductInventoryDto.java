@@ -23,13 +23,8 @@ public class ProductInventoryDto {
     @Schema(description = "Product category", example = "ELECTRONICS")
     private Category category;
 
-    @Schema(description = "Quantity to be saved in the inventory", example = "100")
-    private Long quantity;
-
     @Schema(description = "Warehouse location to be saved in the inventory", example = "st. Petersburg, Russia")
     private String warehouseLocation; // TODO: implement
 
-    @Schema(description = "Show is the active product or not", example = "true")
-    private boolean isActive;
 
 }

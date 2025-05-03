@@ -1,4 +1,4 @@
-package yers.dev.account.exception;
+package yers.dev.account.user.exception;
 
 /**
  * Исключение, выбрасываемое при попытке зарегистрировать пользователя с уже существующим email.

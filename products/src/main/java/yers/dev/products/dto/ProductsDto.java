@@ -15,8 +15,6 @@ public class ProductsDto {
 
     private double price;
 
-    private long stock_quantity;
-
     private Category category;
 
 }

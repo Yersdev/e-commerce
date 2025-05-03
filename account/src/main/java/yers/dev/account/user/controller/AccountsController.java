@@ -1,4 +1,4 @@
-package yers.dev.account.controller;
+package yers.dev.account.user.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,11 +18,11 @@ import yers.dev.account.auth.constant.HttpStatusConstants;
 import yers.dev.account.auth.entity.dto.RegistrationRequest;
 import yers.dev.account.auth.entity.dto.ErrorResponseDto;
 import yers.dev.account.auth.service.KeycloakUserService;
-import yers.dev.account.constants.AccountsConstants;
-import yers.dev.account.dto.ResponseDto;
-import yers.dev.account.dto.AccountsDto;
-import yers.dev.account.service.AccountKeycloakService;
-import yers.dev.account.service.AccountsService;
+import yers.dev.account.user.constants.AccountsConstants;
+import yers.dev.account.user.entity.dto.ResponseDto;
+import yers.dev.account.user.entity.dto.AccountsDto;
+import yers.dev.account.user.service.AccountKeycloakService;
+import yers.dev.account.user.service.AccountsService;
 
 import java.util.List;
 

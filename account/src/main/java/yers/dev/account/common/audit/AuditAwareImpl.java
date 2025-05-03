@@ -1,4 +1,4 @@
-package yers.dev.account.audit;
+package yers.dev.account.common.audit;
 
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;

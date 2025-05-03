@@ -1,9 +1,8 @@
-package yers.dev.account.entity;
+package yers.dev.account.user.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import java.util.UUID;
 
 @Entity
 @Getter

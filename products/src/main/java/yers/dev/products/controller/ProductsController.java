@@ -35,12 +35,12 @@ public class ProductsController {
                 .status(HttpStatus.CREATED)
                 .body(new ResponseDto(MESSAGE_200, MESSAGE_201));
     }
-    @PutMapping("/update")
-    public ResponseEntity<ResponseDto> updateProduct(@Valid @RequestBody ProductInventoryDto productInventoryDto) {
-        productsService.updateProduct(productInventoryDto);
+    @PutMapping("/update/{id}")
+    public ResponseEntity<ResponseDto> updateProduct(@Valid @PathVariable("id") Long id, @RequestBody ProductInventoryDto productInventoryDto) {
+        productsService.updateProduct(id, productInventoryDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ResponseDto(MESSAGE_200, MESSAGE_201_UPDATED_200));
+                .body(new ResponseDto(MESSAGE_200, MESSAGE_200_UPDATED));
     }
 
     @GetMapping("/category/{category}")

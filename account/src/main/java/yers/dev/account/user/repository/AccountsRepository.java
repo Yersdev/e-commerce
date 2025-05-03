@@ -1,8 +1,8 @@
-package yers.dev.account.repository;
+package yers.dev.account.user.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import yers.dev.account.entity.Accounts;
+import yers.dev.account.user.entity.Accounts;
 import java.util.Optional;
 
 @Repository

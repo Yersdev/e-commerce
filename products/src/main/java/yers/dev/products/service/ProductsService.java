@@ -9,11 +9,13 @@ import yers.dev.products.dto.InventoryDto;
 import yers.dev.products.dto.ProductInventoryDto;
 import yers.dev.products.dto.ProductsDto;
 import yers.dev.products.mapper.ProductInventoryMapper;
-import yers.dev.products.mapper.ProductsMapper;
+import yers.dev.products.mapper.ProductsManualMapper;
 import yers.dev.products.model.Category;
+import yers.dev.products.model.Products;
 import yers.dev.products.repository.ProductsRepository;
 import yers.dev.products.service.client.InventoryFeignClient;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -21,11 +23,11 @@ import java.util.List;
 @Slf4j
 public class ProductsService {
     private final ProductsRepository productsRepository;
-    private final ProductsMapper productsMapper;
     private final InventoryFeignClient inventoryFeignClient;
+    private final ProductsManualMapper productsManualMapper;
 
     public List<ProductsDto> getProducts() {
-        return productsMapper.toProductsDto(productsRepository.findAll());
+        return productsManualMapper.toDtoList((productsRepository.findAll()));
     }
 
     @Transactional
@@ -34,7 +36,7 @@ public class ProductsService {
         log.info("ProductInventoryDto: {}", productInventoryDto);
         InventoryDto inventoryDto = ProductInventoryMapper.toInventoryDto(productInventoryDto);
 
-        ProductsDto productsDto = productsMapper.toProductsDto(productInventoryDto);
+        ProductsDto productsDto = ProductInventoryMapper.toProductsDto(productInventoryDto);
 
         log.info("InventoryDto: {}", inventoryDto);
         ResponseEntity<InventoryDto> response = inventoryFeignClient.createInventory(
@@ -44,26 +46,36 @@ public class ProductsService {
         if (response == null ||!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Inventory creation failed: " + response.getStatusCode());
         }
-
-        return productsMapper.toProductsDto(
-                productsRepository.save(productsMapper.toProducts(productsDto))
+        log.info("ProductDto: {}", productsDto);
+        log.info("ProductsMapper: {}", productsManualMapper.toEntity(productsDto));
+        return productsManualMapper.toDto(
+                productsRepository.save(productsManualMapper.toEntity(productsDto))
         );
     }
 
 
     @Transactional
-    public ProductsDto updateProduct(ProductInventoryDto productInventoryDto) {
+    public ProductsDto updateProduct(Long id, ProductInventoryDto productInventoryDto) {
         InventoryDto inventoryDto = ProductInventoryMapper.toInventoryDto(productInventoryDto);
         ProductsDto productsDto = ProductInventoryMapper.toProductsDto(productInventoryDto);
 
+        Products products = productsRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
+
+        products.setName(productsDto.getName());
+        products.setDescription(productsDto.getDescription());
+        products.setCategory(productsDto.getCategory());
+        products.setPrice(productsDto.getPrice());
+        products.setUpdatedAt(LocalDateTime.now());
+        products.setActive(true);
+
         ResponseEntity<InventoryDto> response = inventoryFeignClient.updateInventory(
-            "correlationId", inventoryDto
+            "correlationId", inventoryDto, id
         );
 
         if (response == null || !response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Inventory update failed: " + response.getStatusCode());
         }
-        return productsMapper.toProductsDto(productsRepository.save(productsMapper.toProducts(productsDto)));
+        return productsManualMapper.toDto(productsRepository.save(products));
     }
 
     @Transactional
@@ -72,7 +84,7 @@ public class ProductsService {
     }
 
     public ProductsDto getProduct(Long id) {
-        return productsMapper.toProductsDto(productsRepository.findById(id).orElse(null));
+        return productsManualMapper.toDto(productsRepository.findById(id).orElse(null));
     }
 
     public List<ProductsDto> getProductsByCategory(Category category) {
@@ -82,7 +94,7 @@ public class ProductsService {
 
         return switch (category) {
             case ELECTRONICS, CLOTHING, BOOKS, TOYS, FURNITURE ->
-                    productsMapper.toProductsDto(List.of(productsRepository.findByCategory(category).orElseThrow(() -> new RuntimeException())));
+                    productsManualMapper.toDtoList(List.of(productsRepository.findByCategory(category).orElseThrow(() -> new RuntimeException())));
         };
     }
 }

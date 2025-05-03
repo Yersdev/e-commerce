@@ -1,4 +1,4 @@
-package yers.dev.account.exception;
+package yers.dev.account.common.exception;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -11,7 +11,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import yers.dev.account.dto.ErrorResponseDto;
+import yers.dev.account.user.entity.dto.ErrorResponseDto;
+import yers.dev.account.user.exception.ResourceNotFoundException;
+import yers.dev.account.user.exception.SameAccountExistException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;

@@ -3,7 +3,6 @@ package yers.dev.inventory.controller;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.client.loadbalancer.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -12,9 +11,7 @@ import yers.dev.inventory.dto.InventoryDto;
 import yers.dev.inventory.dto.ProductInventoryDto;
 import yers.dev.inventory.dto.ResponseDto;
 import yers.dev.inventory.service.InventoryService;
-
 import java.util.List;
-
 import static yers.dev.inventory.constants.InventoryConstants.*;
 
 @RestController
@@ -42,12 +39,13 @@ public class InventoryController {
     }
 
     @PutMapping("/update/{productId}")
-    public ResponseEntity<ResponseDto> updateInventory(@RequestBody InventoryDto inventoryDto) {
-        inventoryService.updateInventory(inventoryDto);
+    public ResponseEntity<ResponseDto> updateInventory(@PathVariable("productId") Long productId, @RequestBody InventoryDto inventoryDto) {
+        inventoryService.updateInventory(productId, inventoryDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new ResponseDto(STATUS_200, STATUS_UPDATED_200));
     }
+
     @PostMapping
     public ResponseEntity<ResponseDto> createInventory(@Valid @RequestBody InventoryDto inventoryDto) {
         try {

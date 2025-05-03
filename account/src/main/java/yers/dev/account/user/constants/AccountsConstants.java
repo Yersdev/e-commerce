@@ -1,4 +1,4 @@
-package yers.dev.account.constants;
+package yers.dev.account.user.constants;
 
 public final class AccountsConstants {
 

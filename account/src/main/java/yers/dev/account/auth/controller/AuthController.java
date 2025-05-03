@@ -18,8 +18,8 @@ import yers.dev.account.auth.entity.dto.RegistrationRequest;
 import yers.dev.account.auth.entity.dto.ErrorResponseDto;
 import yers.dev.account.auth.service.AuthService;
 import yers.dev.account.auth.service.KeycloakUserService;
-import yers.dev.account.constants.AccountsConstants;
-import yers.dev.account.dto.ResponseDto;
+import yers.dev.account.user.constants.AccountsConstants;
+import yers.dev.account.user.entity.dto.ResponseDto;
 
 import java.util.Map;
 
