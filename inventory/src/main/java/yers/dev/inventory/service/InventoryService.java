@@ -5,16 +5,14 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import yers.dev.inventory.dto.InventoryDto;
-import yers.dev.inventory.dto.ProductInventoryDto;
-import yers.dev.inventory.dto.ProductsDto;
+import yers.dev.inventory.entity.dto.InventoryDto;
+import yers.dev.inventory.entity.dto.ProductInventoryDto;
+import yers.dev.inventory.entity.dto.ProductsDto;
 import yers.dev.inventory.entity.Inventory;
 import yers.dev.inventory.exception.ProductNotFoundException;
 import yers.dev.inventory.mapper.InventoryMapper;
 import yers.dev.inventory.repository.InventoryRepository;
 import yers.dev.inventory.service.client.ProductFeignClient;
-
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -41,7 +39,6 @@ public class InventoryService {
 
 
     public List<InventoryDto> fetchAllProducts() {
-        System.out.println("fetching all products{} " + inventoryRepository.findAll());
         return inventoryMapper.toInventoryDto(inventoryRepository.findAll());
     }
 
@@ -57,5 +54,10 @@ public class InventoryService {
         inventory.setQuantity(inventoryDto.getQuantity());
         inventory.setWarehouseLocation(inventoryDto.getWarehouseLocation());
         inventoryRepository.save(inventory);
+    }
+
+    @Transactional
+    public void deleteInventory(Long productId) {
+        inventoryRepository.deleteById(productId);
     }
 }

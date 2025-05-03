@@ -1,8 +1,8 @@
 package yers.dev.products.mapper;
 
-import yers.dev.products.dto.InventoryDto;
-import yers.dev.products.dto.ProductInventoryDto;
-import yers.dev.products.dto.ProductsDto;
+import yers.dev.products.model.dto.InventoryDto;
+import yers.dev.products.model.dto.ProductInventoryDto;
+import yers.dev.products.model.dto.ProductsDto;
 
 public class ProductInventoryMapper {
 

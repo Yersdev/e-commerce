@@ -5,9 +5,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import yers.dev.products.dto.ProductInventoryDto;
-import yers.dev.products.dto.ProductsDto;
-import yers.dev.products.dto.ResponseDto;
+import yers.dev.products.model.dto.ProductInventoryDto;
+import yers.dev.products.model.dto.ProductsDto;
+import yers.dev.products.model.dto.ResponseDto;
 import yers.dev.products.model.Category;
 import yers.dev.products.service.ProductsService;
 
@@ -43,13 +43,14 @@ public class ProductsController {
                 .body(new ResponseDto(MESSAGE_200, MESSAGE_200_UPDATED));
     }
 
-    @GetMapping("/category/{category}")
+    @GetMapping("/{category}")
     public ResponseEntity<List<ProductsDto>> getProductsByCategory(@PathVariable("category") Category category) {
         productsService.getProductsByCategory(category);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(productsService.getProductsByCategory(category));
     }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ResponseDto> deleteProduct(@PathVariable("id") Long id) {
         productsService.deleteProduct(id);
@@ -57,6 +58,7 @@ public class ProductsController {
                 .status(HttpStatus.OK)
                 .body(new ResponseDto(MESSAGE_200, STATUS_DELETED_200));
     }
+
     @GetMapping("/fetch/{id}")
     public ResponseEntity<ProductsDto> fetchProductDetails(@PathVariable("id") Long id) {
         return ResponseEntity

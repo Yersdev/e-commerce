@@ -1,7 +1,7 @@
 package yers.dev.products.mapper;
 
 import org.springframework.stereotype.Component;
-import yers.dev.products.dto.ProductsDto;
+import yers.dev.products.model.dto.ProductsDto;
 import yers.dev.products.model.Products;
 
 import java.util.List;

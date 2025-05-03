@@ -1,7 +1,7 @@
 package yers.dev.inventory.mapper;
 
 import org.mapstruct.Mapper;
-import yers.dev.inventory.dto.InventoryDto;
+import yers.dev.inventory.entity.dto.InventoryDto;
 import yers.dev.inventory.entity.Inventory;
 
 import java.util.List;

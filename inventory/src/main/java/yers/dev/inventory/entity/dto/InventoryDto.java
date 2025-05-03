@@ -1,4 +1,4 @@
-package yers.dev.inventory.dto;
+package yers.dev.inventory.entity.dto;
 
 import lombok.Data;
 

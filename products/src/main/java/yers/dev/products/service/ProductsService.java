@@ -5,9 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import yers.dev.products.dto.InventoryDto;
-import yers.dev.products.dto.ProductInventoryDto;
-import yers.dev.products.dto.ProductsDto;
+import yers.dev.products.model.dto.InventoryDto;
+import yers.dev.products.model.dto.ProductInventoryDto;
+import yers.dev.products.model.dto.ProductsDto;
 import yers.dev.products.mapper.ProductInventoryMapper;
 import yers.dev.products.mapper.ProductsManualMapper;
 import yers.dev.products.model.Category;
@@ -80,6 +80,9 @@ public class ProductsService {
 
     @Transactional
     public void deleteProduct(Long id) {
+        if (!inventoryFeignClient.deleteInventory("correlationId", id).getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Inventory deletion failed");
+        }
         productsRepository.deleteById(id);
     }
 
@@ -90,6 +93,9 @@ public class ProductsService {
     public List<ProductsDto> getProductsByCategory(Category category) {
         if (category == null) {
             throw new IllegalArgumentException("Category must not be null");
+        }
+        if (!productsRepository.findByCategory(category).isPresent()) {
+            throw new RuntimeException("Category not found");
         }
 
         return switch (category) {

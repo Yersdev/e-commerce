@@ -1,4 +1,4 @@
-package yers.dev.products.dto;
+package yers.dev.products.model.dto;
 
 import jakarta.persistence.*;
 import lombok.Data;

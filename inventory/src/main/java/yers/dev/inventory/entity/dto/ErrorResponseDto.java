@@ -1,4 +1,4 @@
-package yers.dev.products.dto;
+package yers.dev.inventory.entity.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
