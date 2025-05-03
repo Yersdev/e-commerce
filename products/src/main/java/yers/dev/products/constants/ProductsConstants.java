@@ -10,7 +10,7 @@ public final class ProductsConstants {
     public static final String  ADDRESS = "123 Main Street, New York";
     public static final String  STATUS_201 = "201";
     public static final String  MESSAGE_201 = "Product created successfully";
-    public static final String  MESSAGE_201_UPDATED_200 = "Product created successfully";
+    public static final String MESSAGE_200_UPDATED = "Product updated successfully";
     public static final String  STATUS_200 = "200";
     public static final String  MESSAGE_200 = "Request processed successfully";
     public static final String  STATUS_DELETED_200 = "200";

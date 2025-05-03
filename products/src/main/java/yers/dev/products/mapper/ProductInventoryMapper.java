@@ -1,8 +1,8 @@
 package yers.dev.products.mapper;
 
-import yers.dev.products.dto.InventoryDto;
-import yers.dev.products.dto.ProductInventoryDto;
-import yers.dev.products.dto.ProductsDto;
+import yers.dev.products.model.dto.InventoryDto;
+import yers.dev.products.model.dto.ProductInventoryDto;
+import yers.dev.products.model.dto.ProductsDto;
 
 public class ProductInventoryMapper {
 
@@ -11,7 +11,6 @@ public class ProductInventoryMapper {
         productsDto.setName(dto.getName());
         productsDto.setDescription(dto.getDescription());
         productsDto.setPrice(dto.getPrice());
-        productsDto.setStock_quantity(dto.getStock_quantity());
         productsDto.setCategory(dto.getCategory());
         return productsDto;
     }

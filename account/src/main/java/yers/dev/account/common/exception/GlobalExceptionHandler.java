@@ -1,4 +1,4 @@
-package yers.dev.products.exception;
+package yers.dev.account.common.exception;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -6,13 +6,14 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import yers.dev.products.model.dto.ErrorResponseDto;
-
+import yers.dev.account.user.entity.dto.ErrorResponseDto;
+import yers.dev.account.user.exception.ResourceNotFoundException;
+import yers.dev.account.user.exception.SameAccountExistException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -65,6 +66,25 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(errorResponseDTO, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Обрабатывает исключения, когда аккаунт с такими данными уже существует.
+     *
+     * @param exception   исключение {@link SameAccountExistException}
+     * @param webRequest  текущий веб-запрос
+     * @return {@link ResponseEntity} с {@link yers.dev.account.auth.entity.dto.ErrorResponseDto} и статусом 409 CONFLICT
+     */
+    @ExceptionHandler(SameAccountExistException.class)
+    public ResponseEntity<yers.dev.account.auth.entity.dto.ErrorResponseDto> handleSameAccountExistException(SameAccountExistException exception,
+                                                                                                             WebRequest webRequest) {
+        yers.dev.account.auth.entity.dto.ErrorResponseDto errorResponseDTO = new yers.dev.account.auth.entity.dto.ErrorResponseDto(
+                webRequest.getDescription(false),
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponseDTO, HttpStatus.CONFLICT);
     }
 
 }

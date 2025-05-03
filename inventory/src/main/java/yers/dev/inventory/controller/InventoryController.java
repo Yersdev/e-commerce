@@ -3,18 +3,15 @@ package yers.dev.inventory.controller;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.client.loadbalancer.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import yers.dev.inventory.dto.InventoryDto;
-import yers.dev.inventory.dto.ProductInventoryDto;
-import yers.dev.inventory.dto.ResponseDto;
+import yers.dev.inventory.entity.dto.InventoryDto;
+import yers.dev.inventory.entity.dto.ProductInventoryDto;
+import yers.dev.inventory.entity.dto.ResponseDto;
 import yers.dev.inventory.service.InventoryService;
-
 import java.util.List;
-
 import static yers.dev.inventory.constants.InventoryConstants.*;
 
 @RestController
@@ -42,12 +39,13 @@ public class InventoryController {
     }
 
     @PutMapping("/update/{productId}")
-    public ResponseEntity<ResponseDto> updateInventory(@RequestBody InventoryDto inventoryDto) {
-        inventoryService.updateInventory(inventoryDto);
+    public ResponseEntity<ResponseDto> updateInventory(@PathVariable("productId") Long productId, @RequestBody InventoryDto inventoryDto) {
+        inventoryService.updateInventory(productId, inventoryDto);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new ResponseDto(STATUS_200, STATUS_UPDATED_200));
     }
+
     @PostMapping
     public ResponseEntity<ResponseDto> createInventory(@Valid @RequestBody InventoryDto inventoryDto) {
         try {
@@ -57,6 +55,21 @@ public class InventoryController {
                     .body(new ResponseDto(STATUS_200, MESSAGE_CREATED_200));
         } catch (Exception e) {
             log.error("❌ Error creating inventory: {}", e.getMessage(), e);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDto("500", "Internal inventory error: " + e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/delete/{productId}")
+    public ResponseEntity<ResponseDto> deleteInventory(@PathVariable("productId") Long productId) {
+        try {
+            inventoryService.deleteInventory(productId);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new ResponseDto(STATUS_200, STATUS_DELETED_200));
+        } catch (Exception e) {
+            log.error("❌ Error deleting inventory: {}", e.getMessage(), e);
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ResponseDto("500", "Internal inventory error: " + e.getMessage()));
