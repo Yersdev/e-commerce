@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(name = "KeycloakRoleResponseDto", description = "DTO для представления информации о роли в Keycloak")
 public class KeycloakRoleResponseDto {
 
     /** UUID роли в Keycloak */

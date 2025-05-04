@@ -11,100 +11,137 @@ import yers.dev.account.user.entity.Accounts;
 import yers.dev.account.user.exception.ResourceNotFoundException;
 import yers.dev.account.user.mapper.AccountsMapper;
 import yers.dev.account.user.repository.AccountsRepository;
-
 import java.util.List;
 
+/**
+ * Сервис для управления сущностями {@link Accounts}.
+ * Предоставляет методы для получения списка пользователей,
+ * поиска по email или keycloakId, а также для регистрации,
+ * обновления, активации, деактивации и удаления аккаунтов.
+ */
 @Service
 @AllArgsConstructor
 public class AccountsService {
-    private final AccountsRepository accountsRepository;
-    //private final KeycloakUserService keycloakUserService;
 
+    private final AccountsRepository accountsRepository;
+
+    /**
+     * Возвращает список всех пользователей в виде DTO.
+     *
+     * @return список {@link AccountsDto} всех записей в базе
+     */
     public List<AccountsDto> getAllUsers() {
         return AccountsMapper.mapToUserDto(accountsRepository.findAll());
     }
 
+    /**
+     * Ищет пользователя по адресу электронной почты.
+     *
+     * @param email электронная почта искомого пользователя
+     * @return DTO пользователя
+     * @throws ResourceNotFoundException если пользователя с таким email нет
+     */
     public AccountsDto getUserByEmail(String email) {
-        return AccountsMapper.mapToUserDto(accountsRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("Account", "email", email)), new AccountsDto());
+        Accounts account = accountsRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Account", "email", email));
+        return AccountsMapper.mapToUserDto(account, new AccountsDto());
     }
 
-
     /**
-     * Получает информацию о текущем пользователе по его Keycloak ID.
+     * Ищет пользователя по идентификатору в Keycloak.
      *
      * @param keycloakId идентификатор пользователя в Keycloak
-     * @return данные пользователя в виде {@link AccountsDto}
-     * @throws ResponseStatusException если пользователь не найден
+     * @return DTO пользователя
+     * @throws ResponseStatusException с кодом 404, если пользователь не найден
      */
     public AccountsDto getUserByKeycloakId(String keycloakId) {
-        Accounts accounts = accountsRepository.findByKeycloakId(keycloakId)
+        Accounts account = accountsRepository.findByKeycloakId(keycloakId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Пользователь с id " + keycloakId + " не найден"
                 ));
-        return AccountsMapper.mapToUserDto(accounts, new AccountsDto());
+        return AccountsMapper.mapToUserDto(account, new AccountsDto());
     }
 
     /**
-     * Регистрирует нового пользователя в локальной базе данных.
+     * Регистрирует нового пользователя в локальной базе, создавая запись {@link Accounts}.
      *
-     * @param req        DTO с данными для регистрации
-     * @param keycloakId ID пользователя в Keycloak
+     * @param req        регистрационные данные {@link RegistrationRequest}
+     * @param keycloakId идентификатор созданного пользователя в Keycloak
      */
     @Transactional
     public void registerUser(RegistrationRequest req, String keycloakId) {
-        Accounts u = new Accounts();
-        u.setKeycloakId(keycloakId);
-        u.setName(req.getFirstName());
-        u.setLastName(req.getLastName());
-        u.setEmail(req.getEmail());
-        u.setPhoneNumber(Long.parseLong(req.getPhoneNumber()));
-        u.setActive(true);
-        accountsRepository.save(u);
+        Accounts account = new Accounts();
+        account.setKeycloakId(keycloakId);
+        account.setName(req.getFirstName());
+        account.setLastName(req.getLastName());
+        account.setEmail(req.getEmail());
+        account.setPhoneNumber(Long.parseLong(req.getPhoneNumber()));
+        account.setActive(true);
+        accountsRepository.save(account);
     }
-
 
     /**
-     * Обновляет данные пользователя в базе по его Keycloak ID.
+     * Обновляет данные существующего аккаунта по идентификатору Keycloak.
      *
-     * @param req        DTO с обновлёнными данными
-     * @param keycloakId ID пользователя в Keycloak
-     * @throws ResponseStatusException если пользователь не найден
+     * @param req        DTO с новыми данными {@link RegistrationRequest}
+     * @param keycloakId идентификатор пользователя в Keycloak
+     * @throws ResponseStatusException с кодом 404, если аккаунт не найден
      */
     @Transactional
-    public void KeycloakUpdateAccount(RegistrationRequest req , String keycloakId) {
-
-        Accounts user = accountsRepository.findByKeycloakId(keycloakId)
+    public void KeycloakUpdateAccount(RegistrationRequest req, String keycloakId) {
+        Accounts account = accountsRepository.findByKeycloakId(keycloakId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "User not found: " + keycloakId));
-        user.setName(req.getFirstName());
-        user.setLastName(req.getLastName());
-        user.setEmail(req.getEmail());
-        user.setPhoneNumber(Long.parseLong(req.getPhoneNumber()));
-        user.setActive(true);
-        accountsRepository.save(user);
+                        "User not found: " + keycloakId
+                ));
+        account.setName(req.getFirstName());
+        account.setLastName(req.getLastName());
+        account.setEmail(req.getEmail());
+        account.setPhoneNumber(Long.parseLong(req.getPhoneNumber()));
+        account.setActive(true);
+        accountsRepository.save(account);
     }
 
+    /**
+     * Активирует аккаунт пользователя по его внутреннему ID.
+     *
+     * @param id внутренний идентификатор аккаунта
+     * @throws RuntimeException если пользователь с таким ID не найден
+     */
     @Transactional
     public void activateUser(Long id) {
-        Accounts user = accountsRepository.findByUserId(id).orElseThrow(() -> new RuntimeException("User not found"));
-        user.setActive(true);
-        accountsRepository.save(user);
+        Accounts account = accountsRepository.findByUserId(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Account", "id", String.valueOf(id)));
+        account.setActive(true);
+        accountsRepository.save(account);
     }
 
+    /**
+     * Деактивирует аккаунт пользователя по его внутреннему ID.
+     *
+     * @param id внутренний идентификатор аккаунта
+     * @throws RuntimeException если пользователь с таким ID не найден
+     */
     @Transactional
     public void deactivateUser(Long id) {
-        Accounts user = accountsRepository.findByUserId(id).orElseThrow(() -> new RuntimeException("User not found"));
-        user.setActive(false);
-        accountsRepository.save(user);
+        Accounts account = accountsRepository.findByUserId(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Account", "id", String.valueOf(id)));
+        account.setActive(false);
+        accountsRepository.save(account);
     }
 
-
+    /**
+     * Удаляет аккаунт пользователя по адресу электронной почты.
+     *
+     * @param email электронная почта пользователя
+     * @throws RuntimeException если пользователь с таким email не найден
+     */
     @Transactional
     public void deleteUser(String email) {
-        Accounts user = accountsRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-        accountsRepository.delete(user);
+        Accounts account = accountsRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Account", "email", email));
+        accountsRepository.delete(account);
     }
 
 }

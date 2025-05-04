@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,26 +17,52 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import yers.dev.account.auth.constant.HttpStatusConstants;
 import yers.dev.account.auth.entity.dto.RegistrationRequest;
-import yers.dev.account.auth.entity.dto.ErrorResponseDto;
+import yers.dev.account.auth.entity.dto.KeycloakErrorResponseDto;
 import yers.dev.account.auth.service.KeycloakUserService;
 import yers.dev.account.user.constants.AccountsConstants;
+import yers.dev.account.user.entity.dto.ErrorResponseDto;
 import yers.dev.account.user.entity.dto.ResponseDto;
 import yers.dev.account.user.entity.dto.AccountsDto;
 import yers.dev.account.user.service.AccountKeycloakService;
 import yers.dev.account.user.service.AccountsService;
-
 import java.util.List;
 
+
+@Tag(name = "Accounts"
+    , description = "Operations about accounts")
 @AllArgsConstructor
 @RequestMapping(path="/api/accounts", produces = {MediaType.APPLICATION_JSON_VALUE})
 @Validated
 @RestController
 public class AccountsController {
+
     private final AccountsService accountsService;
     private final KeycloakUserService keycloakUserService;
     private final AccountKeycloakService accountKeycloakService;
 
 
+    @Operation(
+            summary = "Create Account",
+            description = "REST API to account with registration in KeyCloak"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Account created successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "417",
+                    description = "Expectation Failed"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    }
+    )
     @PostMapping("/create")
     public ResponseEntity<ResponseDto> createAccount(@Valid @RequestBody RegistrationRequest request) {
         accountKeycloakService.createNewAccount(request);
@@ -43,6 +70,29 @@ public class AccountsController {
                 .status(HttpStatus.CREATED)
                 .body(new ResponseDto(AccountsConstants.STATUS_201, AccountsConstants.MESSAGE_201));
     }
+
+    @Operation(
+            summary = "Updating Account",
+            description = "REST API to update Account in Database and Keycloak"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Account updated successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "417",
+                    description = "Expectation Failed"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    }
+    )
 
     @PutMapping("/update/{id}")
     public ResponseEntity<ResponseDto> updateAccountDetails(@PathVariable("id") Long id, @Valid @RequestBody RegistrationRequest request) {
@@ -52,6 +102,29 @@ public class AccountsController {
                     .body(new ResponseDto(AccountsConstants.STATUS_200, AccountsConstants.MESSAGE_200));
     }
 
+    @Operation(
+            summary = "Activate Account",
+            description = "REST API to activate Account in Database"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Account activated successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "417",
+                    description = "Expectation Failed"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    }
+    )
+
     @PutMapping("/activate/{id}")
     public ResponseEntity<ResponseDto> activateAccount(@PathVariable("id") Long id) {
         accountsService.activateUser(id);
@@ -60,6 +133,28 @@ public class AccountsController {
                 .body(new ResponseDto(AccountsConstants.STATUS_200, AccountsConstants.MESSAGE_200));
     }
 
+    @Operation(
+            summary = "Deactivate Account",
+            description = "REST API to deactivate Account in Database"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Account deactivated successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "417",
+                    description = "Expectation Failed"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    }
+    )
     @PutMapping("/deactivate/{id}")
     public ResponseEntity<ResponseDto> deactivateAccount(@PathVariable("id") Long id) {
         accountsService.deactivateUser(id);
@@ -68,6 +163,32 @@ public class AccountsController {
                 .body(new ResponseDto(AccountsConstants.STATUS_200, AccountsConstants.MESSAGE_200));
     }
 
+    @Operation(
+            summary = "Delete Account",
+            description = "REST API to delete Account in Database and Keycloak"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Account deleted successfully by email"
+            ),
+            @ApiResponse(
+                    responseCode = "417",
+                    description = "Expectation Failed"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Account not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    }
+    )
     @DeleteMapping("/delete/{email}")
     public ResponseEntity<ResponseDto> deleteAccount(@Valid @PathVariable("email") String email) {
         accountKeycloakService.deleteUser(email);
@@ -76,14 +197,62 @@ public class AccountsController {
                 .body(new ResponseDto(AccountsConstants.STATUS_DELETED_200, AccountsConstants.MESSAGE_DELETED_200));
     }
 
-
-    @GetMapping("/fetch/email/{email}")
+    @Operation(
+            summary = "Fetch Account by Email",
+            description = "REST API to fetch Account by Email in Database"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Account finded successfully by email"
+            ),
+            @ApiResponse(
+                    responseCode = "417",
+                    description = "Expectation Failed"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Email not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    }
+    )
+    @GetMapping("/fetch/{email}")
     public ResponseEntity<AccountsDto> fetchAccountDetailsByEmail(@PathVariable("email") String email) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(accountsService.getUserByEmail(email));
     }
 
+
+    @Operation(
+            summary = "Fetch All Accounts in Database",
+            description = "REST API to fetch All Account in Database"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Account fetched successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "417",
+                    description = "Expectation Failed"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    }
+    )
     @GetMapping
     public ResponseEntity<List<AccountsDto>> getAllAccounts() {
         return ResponseEntity
@@ -91,18 +260,6 @@ public class AccountsController {
                 .body(accountsService.getAllUsers());
     }
 
-
-    /**
-     * Получить список всех пользователей.
-     *
-     * @return список всех пользователей в системе
-     */
-    @GetMapping("/all")
-    public ResponseEntity<List<AccountsDto>> getAll(){
-        return ResponseEntity
-                .status(HttpStatusConstants.OK)
-                .body(accountsService.getAllUsers());
-    }
 
     @Operation(
             summary = "Fetch user by jwt",
@@ -121,7 +278,7 @@ public class AccountsController {
                     responseCode = "500",
                     description = "HTTP Status Internal Server Error",
                     content = @Content(
-                            schema = @Schema(implementation = ErrorResponseDto.class)
+                            schema = @Schema(implementation = KeycloakErrorResponseDto.class)
                     )
             )
     }
@@ -159,7 +316,7 @@ public class AccountsController {
                     responseCode = "500",
                     description = "HTTP Status Internal Server Error",
                     content = @Content(
-                            schema = @Schema(implementation = ErrorResponseDto.class)
+                            schema = @Schema(implementation = KeycloakErrorResponseDto.class)
                     )
             )
     }

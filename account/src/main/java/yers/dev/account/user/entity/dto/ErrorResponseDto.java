@@ -7,31 +7,40 @@ import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
-@Data @AllArgsConstructor
+/**
+ * DTO для передачи информации об ошибке в ответе API.
+ * Содержит сведения о пути запроса, коде и сообщении ошибки, а также о времени её возникновения.
+ */
+@Data
+@AllArgsConstructor
 @Schema(
         name = "ErrorResponse",
-        description = "Schema to hold error response information"
+        description = "Схема, содержащая информацию об ошибке в ответе"
 )
 public class ErrorResponseDto {
 
-    @Schema(
-            description = "API path invoked by client"
-    )
-    private  String apiPath;
+    /**
+     * Путь API, по которому был выполнен запрос, приведший к ошибке.
+     */
+    @Schema(description = "API path invoked by client")
+    private String apiPath;
 
-    @Schema(
-            description = "Error code representing the error happened"
-    )
+    /**
+     * HTTP-статус, обозначающий тип ошибки.
+     */
+    @Schema(description = "Error code representing the error happened")
     private HttpStatus errorCode;
 
-    @Schema(
-            description = "Error message representing the error happened"
-    )
-    private  String errorMessage;
+    /**
+     * Текстовое сообщение с описанием причины ошибки.
+     */
+    @Schema(description = "Error message representing the error happened")
+    private String errorMessage;
 
-    @Schema(
-            description = "Time representing when the error happened"
-    )
+    /**
+     * Момент времени, когда возникла ошибка.
+     */
+    @Schema(description = "Time representing when the error happened")
     private LocalDateTime errorTime;
 
 }

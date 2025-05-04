@@ -1,4 +1,3 @@
-Конечно! Вот временный `README.md` для твоего проекта [e-commerce](https://github.com/Yersdev/e-commerce), основанный на предоставленной информации и общих практиках оформления:
 
 ---
 
@@ -11,7 +10,7 @@
 - Java 17
 - Spring Boot
 - Spring Data JPA
-- MapStruct (или ручная реализация мапперов)
+- MapStruct
 - Lombok
 - PostgreSQL
 - Spring Security
