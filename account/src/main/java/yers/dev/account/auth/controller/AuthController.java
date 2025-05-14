@@ -15,12 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 import yers.dev.account.auth.constant.HttpStatusConstants;
 import yers.dev.account.auth.entity.dto.AuthRequest;
 import yers.dev.account.auth.entity.dto.RegistrationRequest;
-import yers.dev.account.auth.entity.dto.ErrorResponseDto;
+import yers.dev.account.auth.entity.dto.KeycloakErrorResponseDto;
 import yers.dev.account.auth.service.AuthService;
 import yers.dev.account.auth.service.KeycloakUserService;
-import yers.dev.account.user.constants.AccountsConstants;
-import yers.dev.account.user.entity.dto.ResponseDto;
-
+import yers.dev.account.account.entity.dto.ResponseDto;
 import java.util.Map;
 
 /**
@@ -28,7 +26,7 @@ import java.util.Map;
  * Содержит методы регистрации, входа, обновления токена и выхода.
  */
 @Tag(
-        name = "REST API for check Auth of user",
+        name = "REST API for authentication of accounts",
         description = "REST APIs to Auth user"
 )
 @RestController
@@ -40,13 +38,13 @@ public class AuthController {
     private final AuthService authService;
 
     @Operation(
-            summary = "Registration",
+            summary = "Registration of Account",
             description = "REST API to register Account"
     )
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
-                    description = "HTTP Status OK"
+                    description = "Account registered successfully"
             ),
             @ApiResponse(
                     responseCode = "417",
@@ -56,7 +54,7 @@ public class AuthController {
                     responseCode = "500",
                     description = "HTTP Status Internal Server Error",
                     content = @Content(
-                            schema = @Schema(implementation = ErrorResponseDto.class)
+                            schema = @Schema(implementation = KeycloakErrorResponseDto.class)
                     )
             )
     }
@@ -85,7 +83,7 @@ public class AuthController {
                     responseCode = "500",
                     description = "HTTP Status Internal Server Error",
                     content = @Content(
-                            schema = @Schema(implementation = ErrorResponseDto.class)
+                            schema = @Schema(implementation = KeycloakErrorResponseDto.class)
                     )
             )
     }
@@ -114,17 +112,16 @@ public class AuthController {
                     responseCode = "500",
                     description = "HTTP Status Internal Server Error",
                     content = @Content(
-                            schema = @Schema(implementation = ErrorResponseDto.class)
+                            schema = @Schema(implementation = KeycloakErrorResponseDto.class)
                     )
             )
     }
     )
     @PostMapping("/refresh")
     public ResponseEntity<Map<String,Object>> refresh(@RequestBody Map<String,String> body) {
-        String refreshToken = body.get("refresh_token");
         return ResponseEntity
                 .status(HttpStatusConstants.OK)
-                .body(authService.refreshToken(refreshToken));
+                .body(authService.refreshToken(body.get("refresh_token")));
     }
 
 
@@ -145,7 +142,7 @@ public class AuthController {
                     responseCode = "500",
                     description = "HTTP Status Internal Server Error",
                     content = @Content(
-                            schema = @Schema(implementation = ErrorResponseDto.class)
+                            schema = @Schema(implementation = KeycloakErrorResponseDto.class)
                     )
             )
     }
@@ -155,6 +152,6 @@ public class AuthController {
         authService.logout(body.get("refresh_token"));
         return ResponseEntity
                 .status(HttpStatusConstants.OK)
-                .body(new ResponseDto(AccountsConstants.STATUS_200_LOGOUT, AccountsConstants.MESSAGE_200_LOGOUT));
+                .body(new ResponseDto(HttpStatusConstants.STATUS_200_LOGOUT, HttpStatusConstants.MESSAGE_200_LOGOUT));
     }
 }

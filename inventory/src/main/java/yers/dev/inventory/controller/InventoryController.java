@@ -1,5 +1,11 @@
 package yers.dev.inventory.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import yers.dev.inventory.entity.dto.ErrorResponseDto;
 import yers.dev.inventory.entity.dto.InventoryDto;
 import yers.dev.inventory.entity.dto.ProductInventoryDto;
 import yers.dev.inventory.entity.dto.ResponseDto;
@@ -14,6 +21,7 @@ import yers.dev.inventory.service.InventoryService;
 import java.util.List;
 import static yers.dev.inventory.constants.InventoryConstants.*;
 
+@Tag(name = "Inventory", description = "Inventory API")
 @RestController
 @RequestMapping("/api/inventory")
 @AllArgsConstructor
@@ -23,6 +31,28 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
+    @Operation(
+            summary = "Fetch All Products in Database",
+            description = "REST API to fetch All Products in Database"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Products fetched successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "417",
+                    description = "Expectation Failed"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    }
+    )
     @GetMapping
     public ResponseEntity<List<InventoryDto>> getInventory() {
         return ResponseEntity
@@ -30,6 +60,28 @@ public class InventoryController {
                 .body(inventoryService.fetchAllProducts());
     }
 
+    @Operation(
+            summary = "Fetch Product by product id",
+            description = "REST API to fetch product by product id"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Product fetched successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "417",
+                    description = "Expectation Failed"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    }
+    )
     @GetMapping("/{productId}")
     public ResponseEntity<ProductInventoryDto> fetchAllInventoryByProductId(@PathVariable("productId") Long productId) {
         inventoryService.fetchProduct(productId);

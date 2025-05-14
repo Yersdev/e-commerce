@@ -2,39 +2,31 @@ package yers.dev.account.auth.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
 import yers.dev.account.auth.entity.dto.RegistrationRequest;
 import yers.dev.account.auth.util.KeycloakHttpUtil;
-import yers.dev.account.user.mapper.AuthMapper;
-import yers.dev.account.user.service.AccountsService;
-
+import yers.dev.account.auth.exception.FailedToDeleteKeycloak;
+import yers.dev.account.account.mapper.AuthMapper;
+import yers.dev.account.account.service.AccountsService;
 import java.util.List;
 import java.util.Map;
+
 /**
  * Сервис для управления пользователями в Keycloak и локальной базе.
  * Обеспечивает регистрацию, обновление и получение сервисного токена.
  */
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class KeycloakUserService {
 
     /**
      * Утилита для HTTP-запросов к Keycloak.
      */
     private final KeycloakHttpUtil keycloakHttpUtil;
-
-    private final WebClient.Builder webClientBuilder;
 
 
     /**
@@ -88,59 +80,30 @@ public class KeycloakUserService {
      */
     @Transactional
     public Map<String, Object> registerUser(RegistrationRequest req) {
+
         String token = getAdminAccessToken();
+
         Map<String, Object> payload = Map.of(
-                "firstName", req.getFirstName(),
-                "lastName", req.getLastName(),
-                "email", req.getEmail(),
+                "firstName",     req.getFirstName(),
+                "lastName",      req.getLastName(),
+                "email",         req.getEmail(),
                 "emailVerified", true,
-                "enabled", true,
-                "attributes", Map.of(
-                        "phoneNumber", List.of(req.getPhoneNumber())  // обязательно как List
-                ),
+                "enabled",       true,
+                "attributes", Map.of("phoneNumber", List.of(req.getPhoneNumber())),
                 "credentials", List.of(Map.of(
-                        "type", "password",
-                        "value", req.getPassword(),
+                        "type",      "password",
+                        "value",     req.getPassword(),
                         "temporary", false
                 ))
         );
 
-        try {
-            // вместо retrieve() используем exchangeToMono, чтобы точно обработать статус и тело
-            var response = webClientBuilder
-                    .baseUrl(keycloakUrl + "/admin/realms/" + realm)
-                    .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                    .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .build()
-                    .post().uri("/users")
-                    .bodyValue(payload)
-                    .exchangeToMono(clientResponse -> {
-                        if (clientResponse.statusCode().equals(HttpStatus.CREATED)) {
-                            return clientResponse.toBodilessEntity();
-                        } else {
-                            return clientResponse
-                                    .bodyToMono(String.class)
-                                    .flatMap(body -> Mono.error(new RuntimeException(
-                                            "Create user failed: HTTP " +
-                                                    clientResponse.statusCode() +
-                                                    " / body: " + body
-                                    )));
-                        }
-                    })
-                    .block();
+        String keycloakId = keycloakHttpUtil.createUser(
+                keycloakUrl + "/admin/realms/" + realm,
+                token,
+                payload
+        );
 
-            // здесь можно извлечь Location и keycloakId если нужно
-            String location = response.getHeaders().getLocation().toString();
-            String keycloakId = location.substring(location.lastIndexOf('/') + 1);
-
-            accountsService.registerUser(req, keycloakId);
-
-
-        } catch (WebClientResponseException e) {
-            // явная логика логирования, чтобы увидеть тело ошибки
-            log.error("Keycloak returned {}: {}", e.getStatusCode(), e.getResponseBodyAsString());
-            throw e;  // или бросить своё исключение с более понятным сообщением
-        }
+        accountsService.registerUser(req, keycloakId);
 
         return authService.login(AuthMapper.toAuthRequest(req));
     }
@@ -162,7 +125,7 @@ public class KeycloakUserService {
                 "emailVerified", true,
                 "enabled", true,
                 "attributes", Map.of(
-                        "phoneNumber", List.of(req.getPhoneNumber()) // важно: List
+                        "phoneNumber", List.of(req.getPhoneNumber())
                 )
         );
 
@@ -178,26 +141,35 @@ public class KeycloakUserService {
     }
 
 
+    /**
+     * Удаляет пользователя из Keycloak и локальной базы данных.
+     * <p>
+     * Алгоритм работы метода:
+     * <ol>
+     *   <li>Получает admin-токен для доступа к Keycloak.</li>
+     *   <li>Отправляет DELETE-запрос к Keycloak Admin API для удаления пользователя по его internal ID.</li>
+     *   <li>Логирует результат операции или ошибку от Keycloak.</li>
+     *   <li>Удаляет соответствующую запись пользователя в локальном сервисе accountsService.</li>
+     * </ol>
+     *
+     * @param keycloakId Internal ID пользователя в Keycloak
+     * @throws RuntimeException если Keycloak вернёт ошибку при удалении
+     */
     @Transactional
     public void deleteUser(String keycloakId) {
-        String token = getAdminAccessToken(); // Получаем токен администратора
+        String token = getAdminAccessToken();
 
         try {
-            // Выполняем запрос на удаление пользователя
             keycloakHttpUtil.deleteJson(
                     keycloakUrl + "/admin/realms/" + realm,
                     "/users/" + keycloakId,
                     token
             );
-            log.info("User with ID {} has been deleted from Keycloak.", keycloakId);
         } catch (WebClientResponseException e) {
-            // Логирование ошибки при удалении
-            log.error("Keycloak returned {}: {}", e.getStatusCode(), e.getResponseBodyAsString());
-            throw new RuntimeException("Failed to delete user from Keycloak", e);
+            throw new FailedToDeleteKeycloak(e.getResponseBodyAsString());
         }
 
-        // Логика для удаления пользователя из вашей локальной базы данных (если необходимо)
-        accountsService.deleteUser(keycloakId); // Пример вызова для удаления пользователя из локальной базы
+        accountsService.deleteUser(keycloakId);
     }
 
 }

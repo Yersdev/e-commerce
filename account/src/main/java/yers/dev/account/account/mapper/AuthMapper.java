@@ -1,4 +1,4 @@
-package yers.dev.account.user.mapper;
+package yers.dev.account.account.mapper;
 
 import yers.dev.account.auth.entity.dto.AuthRequest;
 import yers.dev.account.auth.entity.dto.RegistrationRequest;

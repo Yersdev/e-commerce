@@ -6,9 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import yers.dev.account.auth.entity.dto.AuthRequest;
-import yers.dev.account.auth.entity.dto.RegistrationRequest;
 import yers.dev.account.auth.util.KeycloakHttpUtil;
-
 import java.util.Map;
 
 /**
