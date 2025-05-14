@@ -1,4 +1,4 @@
-package yers.dev.account.user.constants;
+package yers.dev.account.account.constants;
 
 /**
  * Contains constant values for HTTP response statuses and messages

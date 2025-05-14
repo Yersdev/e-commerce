@@ -1,4 +1,4 @@
-package yers.dev.account.user.service;
+package yers.dev.account.account.service;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -6,11 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import yers.dev.account.auth.entity.dto.RegistrationRequest;
-import yers.dev.account.user.entity.dto.AccountsDto;
-import yers.dev.account.user.entity.Accounts;
-import yers.dev.account.user.exception.ResourceNotFoundException;
-import yers.dev.account.user.mapper.AccountsMapper;
-import yers.dev.account.user.repository.AccountsRepository;
+import yers.dev.account.account.entity.dto.AccountsDto;
+import yers.dev.account.account.entity.Accounts;
+import yers.dev.account.account.exception.ResourceNotFoundException;
+import yers.dev.account.account.mapper.AccountsMapper;
+import yers.dev.account.account.repository.AccountsRepository;
 import java.util.List;
 
 /**

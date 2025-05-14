@@ -1,4 +1,4 @@
-package yers.dev.account.user.entity;
+package yers.dev.account.account.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;

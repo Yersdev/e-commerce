@@ -18,7 +18,7 @@ import yers.dev.account.auth.entity.dto.RegistrationRequest;
 import yers.dev.account.auth.entity.dto.KeycloakErrorResponseDto;
 import yers.dev.account.auth.service.AuthService;
 import yers.dev.account.auth.service.KeycloakUserService;
-import yers.dev.account.user.entity.dto.ResponseDto;
+import yers.dev.account.account.entity.dto.ResponseDto;
 import java.util.Map;
 
 /**

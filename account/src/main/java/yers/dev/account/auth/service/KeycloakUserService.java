@@ -10,8 +10,8 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import yers.dev.account.auth.entity.dto.RegistrationRequest;
 import yers.dev.account.auth.util.KeycloakHttpUtil;
 import yers.dev.account.auth.exception.FailedToDeleteKeycloak;
-import yers.dev.account.user.mapper.AuthMapper;
-import yers.dev.account.user.service.AccountsService;
+import yers.dev.account.account.mapper.AuthMapper;
+import yers.dev.account.account.service.AccountsService;
 import java.util.List;
 import java.util.Map;
 

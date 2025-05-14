@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import yers.dev.account.auth.entity.dto.KeycloakErrorResponseDto;
 import yers.dev.account.auth.exception.FailedToDeleteKeycloak;
-import yers.dev.account.user.entity.dto.ErrorResponseDto;
-import yers.dev.account.user.exception.ResourceNotFoundException;
-import yers.dev.account.user.exception.SameAccountExistException;
+import yers.dev.account.account.entity.dto.ErrorResponseDto;
+import yers.dev.account.account.exception.ResourceNotFoundException;
+import yers.dev.account.account.exception.SameAccountExistException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;

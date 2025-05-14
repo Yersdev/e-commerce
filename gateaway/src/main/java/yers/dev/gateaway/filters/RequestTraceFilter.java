@@ -11,6 +11,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
+/**
+ * Глобальный фильтр для Spring Cloud Gateway, ответственный за
+ * управление и логирование идентификатора корреляции (correlation-id)
+ * в каждом входящем HTTP-запросе.
+ * <p>
+ * Если в заголовках запроса уже присутствует {@link FilterUtility#CORRELATION_ID},
+ * то он логируется. Иначе генерируется новый UUID и добавляется в заголовки.
+ */
 @Order(1)
 @Component
 public class RequestTraceFilter implements GlobalFilter {
@@ -18,32 +28,46 @@ public class RequestTraceFilter implements GlobalFilter {
     private static final Logger logger = LoggerFactory.getLogger(RequestTraceFilter.class);
 
     @Autowired
-    FilterUtility filterUtility;
+    private FilterUtility filterUtility;
 
+    /**
+     * Основной метод фильтра. Проверяет наличие заголовка корреляции
+     * и либо логирует существующий идентификатор, либо генерирует и устанавливает новый.
+     *
+     * @param exchange текущее состояние сервера (запрос/ответ)
+     * @param chain    цепочка следующих фильтров Gateway
+     * @return реактивный тип {@link Mono<Void>} для продолжения обработки запроса
+     */
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         HttpHeaders requestHeaders = exchange.getRequest().getHeaders();
         if (isCorrelationIdPresent(requestHeaders)) {
-            logger.debug("e-commerce-correlation-id found in RequestTraceFilter : {}",
-                    filterUtility.getCorrelationId(requestHeaders));
+            String existingId = filterUtility.getCorrelationId(requestHeaders);
+            logger.debug("e-commerce-correlation-id found in RequestTraceFilter: {}", existingId);
         } else {
-            String correlationID = generateCorrelationId();
-            exchange = filterUtility.setCorrelationId(exchange, correlationID);
-            logger.debug("e-commerce-correlation-id generated in RequestTraceFilter : {}", correlationID);
+            String newId = generateCorrelationId();
+            exchange = filterUtility.setCorrelationId(exchange, newId);
+            logger.debug("e-commerce-correlation-id generated in RequestTraceFilter: {}", newId);
         }
         return chain.filter(exchange);
     }
 
+    /**
+     * Проверяет, присутствует ли в заголовках запроса идентификатор корреляции.
+     *
+     * @param requestHeaders HTTP-заголовки запроса
+     * @return {@code true}, если заголовок {@link FilterUtility#CORRELATION_ID} задан и не пустой
+     */
     private boolean isCorrelationIdPresent(HttpHeaders requestHeaders) {
-        if (filterUtility.getCorrelationId(requestHeaders) != null) {
-            return true;
-        } else {
-            return false;
-        }
+        return filterUtility.getCorrelationId(requestHeaders) != null;
     }
 
+    /**
+     * Генерирует новый уникальный идентификатор корреляции на основе UUID.
+     *
+     * @return строковое представление сгенерированного UUID
+     */
     private String generateCorrelationId() {
-        return java.util.UUID.randomUUID().toString();
+        return UUID.randomUUID().toString();
     }
-
 }

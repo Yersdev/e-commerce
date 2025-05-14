@@ -1,4 +1,4 @@
-package yers.dev.account.user.entity.dto;
+package yers.dev.account.account.entity.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
